@@ -43,7 +43,7 @@ jobs:
       run: |
            cd 1_infrastructure/aws/terraform
            echo $AWS_DEFAULT_REGION
-           echo test
+           echo test2
            terraform init  
            terraform plan
   
