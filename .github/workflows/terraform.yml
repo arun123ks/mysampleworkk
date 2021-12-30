@@ -29,15 +29,17 @@ jobs:
            cd 1_infrastructure/aws/terraform
            terraform init  
            
-           
-           
-           
-    - name: Terraform Plan
+    - name: Setup AWS ceredentials 
+      uses: aws-actions/configure-aws-credentials@v1
       with:
            aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
            aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
            aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
-           aws-token: ${{ secrets.AWS_ROLE_TO_ASSUME }}  
+           aws-token: ${{ secrets.AWS_ROLE_TO_ASSUME }}        
+           
+           
+           
+    - name: Terraform Plan
       run: |
            cd 1_infrastructure/aws/terraform
            echo $AWS_DEFAULT_REGION
