@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: production
 
-    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    # 1Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
     defaults:
       run:
         shell: bash
@@ -22,12 +22,6 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
     
-
-    # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
-    - name: Terraform Setup and Syntax Validation
-      run: |
-           cd 1_infrastructure/aws/terraform
-           terraform init  
            
     - name: Setup AWS ceredentials 
       uses: aws-actions/configure-aws-credentials@v1
@@ -35,29 +29,12 @@ jobs:
            aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
            aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
            aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
-           aws-session-token: ${{ secrets.AWS_TOKEN }}        
-           
-           
-           
-    - name: Terraform Plan
-      run: |
-           cd 1_infrastructure/aws/terraform
-           echo $AWS_DEFAULT_REGION
-           echo test2
-           terraform init  
-           terraform plan
-  
-      # On push to main, build or change infrastructure according to Terraform configuration files
-      # Note: It is recommended to set up a required "strict" status check in your repository for "Terraform Cloud". See the documentation on "strict" required status checks for more information: https://help.github.com/en/github/administering-a-repository/types-of-required-status-checks
-    - name: Terraform Apply
-      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-      run: |
-           pwd
-           cd 1_infrastructure/aws/terraform/
-           terraform apply -auto-approve
-      
-    - name: Upload tfstate file in artifacts
-      uses: actions/upload-artifact@v2
+           aws-session-token: ${{ secrets.AWS_TOKEN }}         
+       
+          
+    - name: Deploy to AWS CloudFormation
+      uses: aws-actions/aws-cloudformation-github-deploy@v1
       with:
-          name: tfstate-prod
-          path: 1_infrastructure/aws/terraform/terraform.tfstate  
+        name: MyStack
+        template: 1_infrastructure/aws/cloudformation/vpcinfra.yaml
+        parameter-overrides: "EnvironmentName=test,VpcCIDR=10.0.0.0/16,PublicSubnet1CIDR=10.0.0.0/24,PublicSubnet2CIDR=10.0.1.0/24,PrivateSubnet1CIDR=10.0.2.0/24,PrivateSubnet2CIDR=10.0.3.0/24,PrivateSubnet3CIDR=10.0.4.0/24,PrivateSubnet4CIDR=10.0.5.0/24,SSHLocation=0.0.0.0/0,BastionInstanceType=t2.micro,EC2KeyName=tintest"
