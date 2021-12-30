@@ -28,6 +28,7 @@ jobs:
       run: |
            cd 1_infrastructure/aws/terraform
            terraform init  
+           pwd
            
            
            
