@@ -53,10 +53,11 @@ jobs:
       if: github.ref == 'refs/heads/main' && github.event_name == 'push'
       run: |
            pwd
+           cd 1_infrastructure/aws/terraform/
            terraform apply -auto-approve
       
     - name: Upload tfstate file in artifacts
-        uses: actions/upload-artifact@v2
-        with:
+      uses: actions/upload-artifact@v2
+      with:
           name: tfstate-prod
           path: 1_infrastructure/aws/terraform/terraform.tfstate  
